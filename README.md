@@ -185,7 +185,15 @@ npm run test
 
 ## Coverage (cobertura de código)
 
-**Backend** (Jest):
+Desde la **raíz del monorepo** puedes ejecutar el coverage de backend y frontend y ver en consola el listado de archivos con su estado (Stmts, Branch, Funcs, Lines):
+
+```bash
+npm run test:coverage
+```
+
+Se ejecuta primero el coverage del backend y luego el del frontend; en ambos se imprime la tabla por archivo y el resumen global.
+
+**Backend** (Jest), desde `packages/backend`:
 
 ```bash
 cd packages/backend
