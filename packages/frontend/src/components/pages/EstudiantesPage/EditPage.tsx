@@ -63,8 +63,8 @@ export function EditPage() {
   if (loadingData) {
     return (
       <MainLayout>
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-8 shadow-sm ring-1 ring-slate-200/50 sm:p-10 w-full">
-          <p className="text-slate-600">Cargando…</p>
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-8 shadow-sm ring-1 ring-slate-200/50 dark:border-slate-600 dark:bg-slate-800/95 dark:ring-slate-600/50 sm:p-10 w-full">
+          <p className="text-slate-600 dark:text-slate-300">Cargando…</p>
         </div>
       </MainLayout>
     );
@@ -72,17 +72,17 @@ export function EditPage() {
 
   return (
     <MainLayout>
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-8 shadow-sm ring-1 ring-slate-200/50 sm:p-10 w-full">
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-8 shadow-sm ring-1 ring-slate-200/50 dark:border-slate-600 dark:bg-slate-800/95 dark:ring-slate-600/50 sm:p-10 w-full">
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
           Editar estudiante
         </h2>
-        <p className="mt-2 text-slate-600 text-sm">
+        <p className="mt-2 text-slate-600 dark:text-slate-300 text-sm">
           Modifica los datos del estudiante. El código de alumno no se puede cambiar.
         </p>
         <form onSubmit={handleSubmit} className="mt-6 w-full xl:max-w-[70%]">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label htmlFor="firstName" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                 Nombre
               </label>
               <Input
@@ -95,7 +95,7 @@ export function EditPage() {
               />
             </div>
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label htmlFor="lastName" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                 Apellidos
               </label>
               <Input
@@ -108,7 +108,7 @@ export function EditPage() {
               />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                 Email de usuario
               </label>
               <Input
@@ -120,7 +120,7 @@ export function EditPage() {
               />
             </div>
             <div>
-              <label htmlFor="document" className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label htmlFor="document" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                 Documento
               </label>
               <Input
@@ -133,7 +133,7 @@ export function EditPage() {
               />
             </div>
             <div>
-              <label htmlFor="birthDate" className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label htmlFor="birthDate" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                 Fecha de nacimiento
               </label>
               <Input
@@ -146,7 +146,7 @@ export function EditPage() {
             </div>
           </div>
           {error && (
-            <p className="mt-5 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+            <p className="mt-5 text-sm text-red-600 bg-red-50 dark:text-red-300 dark:bg-red-900/30 rounded-lg px-3 py-2">{error}</p>
           )}
           <div className="flex gap-3 pt-6">
             <Button type="submit" disabled={loading}>
@@ -155,7 +155,7 @@ export function EditPage() {
             <button
               type="button"
               onClick={() => navigate('/estudiantes')}
-              className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 shadow-sm hover:bg-slate-50 dark:text-slate-200 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
             >
               Cancelar
             </button>

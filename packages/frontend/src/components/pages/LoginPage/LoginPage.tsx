@@ -43,11 +43,11 @@ export function LoginPage() {
 
   return (
     <MainLayout>
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-8 shadow-sm ring-1 ring-slate-200/50 sm:p-10 max-w-md mx-auto">
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-8 shadow-sm ring-1 ring-slate-200/50 dark:border-slate-600 dark:bg-slate-800/95 dark:ring-slate-600/50 sm:p-10 max-w-md mx-auto">
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
           Iniciar sesión
         </h2>
-        <p className="mt-2 text-slate-600 text-sm">
+        <p className="mt-2 text-slate-600 dark:text-slate-300 text-sm">
           Usuario administrador: <strong>admin</strong> / <strong>Admin123!</strong><br />
           Usuario alumno: <strong>jperez</strong> / <strong>Alumno123!</strong><br />
           Contraseña de nuevos alumnos: <strong>TempStudent1!</strong>
@@ -56,7 +56,7 @@ export function LoginPage() {
           <div>
             <label
               htmlFor="username"
-              className="block text-sm font-medium text-slate-700 mb-1.5"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
             >
               Usuario
             </label>
@@ -73,7 +73,7 @@ export function LoginPage() {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-slate-700 mb-1.5"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
             >
               Contraseña
             </label>
@@ -88,7 +88,7 @@ export function LoginPage() {
             />
           </div>
           {error && (
-            <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">
+            <p className="text-sm text-red-600 bg-red-50 dark:text-red-300 dark:bg-red-900/30 rounded-lg px-3 py-2">
               {error}
             </p>
           )}

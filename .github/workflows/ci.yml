@@ -1,0 +1,135 @@
+# CI: tests unitarios + e2e. Los jobs de deploy (AWS, DO, Vercel) pueden depender de este workflow
+# o incluirse en workflows separados que reutilicen estos jobs.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  test-unit:
+    name: Tests unitarios
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run backend unit tests
+        run: npm run test -w backend
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-secret
+          TYPEORM_HOST: localhost
+          TYPEORM_PORT: 5432
+          TYPEORM_USERNAME: postgres
+          TYPEORM_PASSWORD: postgres
+          TYPEORM_DATABASE: academic_test
+          STUDENT_DEFAULT_PASSWORD: TempStudent1!
+
+      - name: Run frontend unit tests
+        run: npm run test -w frontend
+        env:
+          VITE_API_BASE: http://localhost:3000
+
+  test-e2e:
+    name: Tests e2e (Playwright)
+    runs-on: ubuntu-latest
+    needs: test-unit
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: academic_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build backend
+        run: npm run build -w backend
+        env:
+          NODE_ENV: production
+          JWT_SECRET: e2e-secret
+          TYPEORM_HOST: localhost
+          TYPEORM_PORT: 5432
+          TYPEORM_USERNAME: postgres
+          TYPEORM_PASSWORD: postgres
+          TYPEORM_DATABASE: academic_e2e
+          STUDENT_DEFAULT_PASSWORD: TempStudent1!
+
+      - name: Run migrations (e2e DB)
+        run: npm run migrations:run -w backend
+        env:
+          NODE_ENV: production
+          JWT_SECRET: e2e-secret
+          TYPEORM_HOST: localhost
+          TYPEORM_PORT: 5432
+          TYPEORM_USERNAME: postgres
+          TYPEORM_PASSWORD: postgres
+          TYPEORM_DATABASE: academic_e2e
+          STUDENT_DEFAULT_PASSWORD: TempStudent1!
+
+      - name: Build frontend
+        run: npm run build -w frontend
+        env:
+          VITE_API_BASE: http://localhost:3000
+
+      - name: Start backend and frontend, run e2e
+        run: |
+          node packages/backend/dist/main.js &
+          npx serve -s packages/frontend/dist -l 5173 &
+          sleep 3
+          for i in $(seq 1 20); do curl -s -o /dev/null http://localhost:3000 && curl -s -o /dev/null http://localhost:5173 && break; sleep 1; done
+          npx playwright test --project=chromium
+        env:
+          NODE_ENV: production
+          PORT: 3000
+          JWT_SECRET: e2e-secret
+          TYPEORM_HOST: localhost
+          TYPEORM_PORT: 5432
+          TYPEORM_USERNAME: postgres
+          TYPEORM_PASSWORD: postgres
+          TYPEORM_DATABASE: academic_e2e
+          STUDENT_DEFAULT_PASSWORD: TempStudent1!
+          PLAYWRIGHT_BASE_URL: http://localhost:5173
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

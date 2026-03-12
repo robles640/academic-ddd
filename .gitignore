@@ -14,7 +14,6 @@ coverage
 .idea
 .vscode
 *.tsbuildinfo
-package-lock.json
 
 # Playwright e2e
 test-results/

@@ -7,7 +7,7 @@ import { getStudentsPaginated, deleteStudent, type Student } from '../../../serv
 import { formatDate } from '../../../lib';
 
 const STUDENT_COLUMNS: DataTableColumn<Student>[] = [
-  { id: 'code', label: 'Código', sortable: true, value: (r) => r.code, render: (r) => <span className="font-medium text-slate-900">{r.code}</span> },
+  { id: 'code', label: 'Código', sortable: true, value: (r) => r.code, render: (r) => <span className="font-medium text-slate-900 dark:text-slate-100">{r.code}</span> },
   { id: 'firstName', label: 'Nombre', sortable: true, value: (r) => r.firstName },
   { id: 'lastName', label: 'Apellidos', sortable: true, value: (r) => r.lastName },
   { id: 'username', label: 'Usuario', sortable: true, value: (r) => r.username ?? '' },
@@ -73,7 +73,7 @@ export function EstudiantesPage() {
       <button
         type="button"
         onClick={() => navigate(`/estudiantes/${student.id}/editar`)}
-        className="rounded-lg px-3 py-1.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+        className="rounded-lg px-3 py-1.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/30 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 dark:focus:ring-offset-slate-800"
       >
         Editar
       </button>
@@ -81,7 +81,7 @@ export function EstudiantesPage() {
         type="button"
         onClick={() => handleDelete(student)}
         disabled={deletingId === student.id}
-        className="rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 disabled:opacity-50"
+        className="rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 dark:focus:ring-offset-slate-800 disabled:opacity-50"
       >
         {deletingId === student.id ? 'Eliminando…' : 'Eliminar'}
       </button>
@@ -90,9 +90,9 @@ export function EstudiantesPage() {
 
   return (
     <MainLayout>
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-8 shadow-sm ring-1 ring-slate-200/50 sm:p-10">
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-8 shadow-sm ring-1 ring-slate-200/50 dark:border-slate-600 dark:bg-slate-800/95 dark:ring-slate-600/50 sm:p-10">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
             Estudiantes
           </h2>
           <Button type="button" onClick={() => navigate('/estudiantes/registro')}>
@@ -122,7 +122,7 @@ export function EstudiantesPage() {
           />
         </div>
         {error && (
-          <p className="mt-4 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+          <p className="mt-4 text-sm text-red-600 bg-red-50 dark:text-red-300 dark:bg-red-900/30 rounded-lg px-3 py-2">{error}</p>
         )}
       </div>
     </MainLayout>

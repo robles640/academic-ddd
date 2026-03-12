@@ -130,18 +130,18 @@ export function DataTable<T>({
   };
 
   if (!isServerSide && data.length === 0) {
-    return <p className="text-slate-600 py-6">{emptyMessage}</p>;
+    return <p className="text-slate-600 dark:text-slate-400 py-6">{emptyMessage}</p>;
   }
 
   if (isServerSide && total === 0 && !loading) {
-    return <p className="text-slate-600 py-6">{emptyMessage}</p>;
+    return <p className="text-slate-600 dark:text-slate-400 py-6">{emptyMessage}</p>;
   }
 
   return (
     <div className="space-y-4">
-      <div className="overflow-x-auto rounded-lg border border-slate-200">
-        <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-          <thead className="bg-slate-50 text-slate-700">
+      <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-600">
+        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-600 text-left text-sm">
+          <thead className="bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
             <tr>
               {columns.map((col) => (
                 <th
@@ -154,11 +154,11 @@ export function DataTable<T>({
                       type="button"
                       onClick={() => handleSort(col.id)}
                       disabled={loading}
-                      className="inline-flex items-center gap-1 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 rounded disabled:opacity-50"
+                      className="inline-flex items-center gap-1 hover:text-slate-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 dark:focus:ring-offset-slate-800 rounded disabled:opacity-50"
                     >
                       {col.label}
                       {sortKey === col.id && (
-                        <span className="text-indigo-600" aria-hidden>
+                        <span className="text-indigo-600 dark:text-indigo-400" aria-hidden>
                           {sortDir === 'asc' ? '↑' : '↓'}
                         </span>
                       )}
@@ -175,20 +175,20 @@ export function DataTable<T>({
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200 bg-white">
+          <tbody className="divide-y divide-slate-200 bg-white dark:divide-slate-600 dark:bg-slate-800/50">
             {loading ? (
               <tr>
-                <td colSpan={columns.length + (renderActions ? 1 : 0)} className="px-4 py-8 text-center text-slate-500">
+                <td colSpan={columns.length + (renderActions ? 1 : 0)} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
                   Cargando…
                 </td>
               </tr>
             ) : (
               paginatedData.map((row) => (
-                <tr key={keyExtractor(row)} className="hover:bg-slate-50/70">
+                <tr key={keyExtractor(row)} className="hover:bg-slate-50/70 dark:hover:bg-slate-700/50">
                   {columns.map((col) => (
                     <td
                       key={col.id}
-                      className={`px-4 py-3 text-slate-700 ${col.align === 'right' ? 'text-right' : ''}`}
+                      className={`px-4 py-3 text-slate-700 dark:text-slate-300 ${col.align === 'right' ? 'text-right' : ''}`}
                     >
                       {col.render ? col.render(row) : (col.value(row) ?? '–')}
                     </td>
@@ -203,7 +203,7 @@ export function DataTable<T>({
         </table>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600 dark:text-slate-400">
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2">
             Filas por página
@@ -211,7 +211,7 @@ export function DataTable<T>({
               value={pageSize}
               onChange={(e) => handlePageSizeChange(Number(e.target.value))}
               disabled={loading}
-              className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 disabled:opacity-50"
+              className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 disabled:opacity-50"
             >
               {pageSizeOptions.map((n) => (
                 <option key={n} value={n}>
@@ -229,7 +229,7 @@ export function DataTable<T>({
             type="button"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage <= 1 || loading}
-            className="rounded-lg px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:pointer-events-none"
+            className="rounded-lg px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 disabled:opacity-50 disabled:pointer-events-none"
           >
             Anterior
           </button>
@@ -240,7 +240,7 @@ export function DataTable<T>({
             type="button"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage >= totalPages || loading}
-            className="rounded-lg px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:pointer-events-none"
+            className="rounded-lg px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 disabled:opacity-50 disabled:pointer-events-none"
           >
             Siguiente
           </button>

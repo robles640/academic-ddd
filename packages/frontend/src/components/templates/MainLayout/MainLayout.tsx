@@ -12,7 +12,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const user = useAuthStore((s) => s.user);
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-b from-slate-50 to-slate-100/80">
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-slate-50 to-slate-100/80 dark:from-slate-900 dark:to-slate-800">
       <Header onMenuClick={user ? () => setSidebarOpen((o) => !o) : undefined} />
       <div className="flex flex-1">
         <Sidebar

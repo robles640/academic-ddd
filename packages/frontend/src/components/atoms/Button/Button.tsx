@@ -12,7 +12,7 @@ export function Button({ className = '', ...props }: ButtonProps) {
         bg-indigo-600 shadow-sm ring-1 ring-inset ring-indigo-500/20
         transition-all duration-200
         hover:bg-indigo-500 hover:shadow-md hover:ring-indigo-500/30
-        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900
         disabled:opacity-50 disabled:pointer-events-none
         ${className}
       `.trim()}
