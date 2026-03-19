@@ -4,7 +4,6 @@ import { MainLayout } from '../../templates/MainLayout';
 import { Button } from '../../atoms/Button';
 import { Input } from '../../atoms/Input';
 import { createStudent } from '../../../services/studentService';
-import { trackEvent, trackPageView } from '../../../lib/analytics';
 
 export function RegisterPage() {
   const navigate = useNavigate();
