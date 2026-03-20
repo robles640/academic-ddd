@@ -12,7 +12,7 @@ import {
 import { ScheduleService } from '../../../contexts/academic/schedule/application/schedule.service';
 import { ScheduleSortField } from 'src/contexts/academic/schedule/domain/schedule.repository';
 
-const SORT_FIELDS: ScheduleSortField[] = ['slot', 'createdAt'];
+const SORT_FIELDS: ScheduleSortField[] = ['slot', 'createdAt', 'courseName'];
 
 @Controller('schedules')
 export class SchedulesController {
@@ -61,8 +61,6 @@ export class SchedulesController {
     }){
       const schedule = await this.scheduleService.update(id, body);
       if (!schedule) throw new NotFoundException('Schedule not found');
-      console.log(body.courseId);
-      console.log(body.slot);
       return schedule;
     }
 

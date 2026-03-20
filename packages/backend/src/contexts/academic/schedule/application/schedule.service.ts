@@ -8,6 +8,16 @@ export type SchedulesPaginatedResult = {
   total: number;
 };
 
+const DAY_ORDER: Record<string, number> = {
+  'Lunes': 0,
+  'Martes': 1,
+  'Miércoles': 2,
+  'Jueves': 3,
+  'Viernes': 4,
+  'Sábado': 5,
+  'Domingo': 6,
+};
+
 @Injectable()
 export class ScheduleService {
   constructor(
@@ -15,6 +25,44 @@ export class ScheduleService {
     private readonly scheduleRepository: IScheduleRepository,
     private readonly courseService: CourseService,
   ) {}
+
+  private sortSchedules(
+    data: Array<Schedule & { courseName: string }>,
+    sortBy?: ScheduleSortField,
+    sortOrder?: 'asc' | 'desc',
+  ): Array<Schedule & { courseName: string }> {
+    if (!sortBy) return data;
+
+    const sorted = [...data];
+    const isAsc = sortOrder === 'asc';
+
+    sorted.sort((a, b) => {
+      let compareResult = 0;
+
+      if (sortBy === 'courseName') {
+        compareResult = a.courseName.localeCompare(b.courseName);
+      } else if (sortBy === 'slot') {
+
+        const [dayA, timeA] = a.slot.split(' ');
+        const [dayB, timeB] = b.slot.split(' ');
+        
+        console.log('DEBUG sortSchedules:', { dayA, timeA, dayB, timeB, 'DAY_ORDER[dayA]': DAY_ORDER[dayA], 'DAY_ORDER[dayB]': DAY_ORDER[dayB] });
+        
+        const dayOrderA = DAY_ORDER[dayA] ?? 7;
+        const dayOrderB = DAY_ORDER[dayB] ?? 7;
+
+        if (dayOrderA !== dayOrderB) {
+          compareResult = dayOrderA - dayOrderB;
+        } else {
+          compareResult = (timeA || '').localeCompare(timeB || '');
+        }
+      }
+
+      return isAsc ? compareResult : -compareResult;
+    });
+
+    return sorted;
+  }
 
   async findAll(): Promise<Schedule[]> {
     return this.scheduleRepository.findAll();
@@ -43,12 +91,28 @@ export class ScheduleService {
     ): Promise<SchedulesPaginatedResult> {
       const offset = (Math.max(1, page) - 1) * Math.max(1, pageSize);
       const limit = Math.min(100, Math.max(1, pageSize));
-      const { data: schedules, total } = await this.scheduleRepository.findPaginated({
-        offset,
-        limit,
-        sortBy,
-        sortOrder,
-      });
+      
+      const shouldSortInMemory = sortBy === 'courseName' || sortBy === 'slot';
+      
+      let schedules: Schedule[];
+      let total: number;
+
+      if (shouldSortInMemory) {
+      
+        schedules = await this.scheduleRepository.findAll();
+        total = schedules.length;
+      } else {
+      
+        const result = await this.scheduleRepository.findPaginated({
+          offset,
+          limit,
+          sortBy,
+          sortOrder,
+        });
+        schedules = result.data;
+        total = result.total;
+      }
+      
       const data: Array<Schedule & { courseName: string }> = [];
       for (const schedule of schedules) {
         const course = await this.courseService.findById(schedule.courseId);
@@ -57,7 +121,14 @@ export class ScheduleService {
           courseName: course?.name ?? '',
         });
       }
-      return { data, total };
+
+      const sorted = shouldSortInMemory 
+        ? this.sortSchedules(data, sortBy, sortOrder)
+        : data;
+
+      const paginatedData = sorted.slice(offset, offset + limit);
+      
+      return { data: paginatedData, total };
     }
 
   async findById(id: string): Promise<Schedule | null> {

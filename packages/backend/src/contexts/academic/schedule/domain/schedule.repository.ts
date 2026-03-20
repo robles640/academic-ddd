@@ -2,7 +2,7 @@ import { Schedule } from './schedule.entity';
 
 export const SCHEDULE_REPOSITORY = Symbol('SCHEDULE_REPOSITORY');
 
-export type ScheduleSortField = 'slot' | 'createdAt';
+export type ScheduleSortField = 'slot' | 'createdAt' | 'courseName';
 
 export type FindPaginatedOptions = {
   offset: number;

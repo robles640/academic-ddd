@@ -5,7 +5,7 @@ import { Schedule } from '../domain/schedule.entity';
 import { IScheduleRepository, type FindPaginatedOptions, type ScheduleSortField } from '../domain/schedule.repository';
 import { ScheduleTypeOrmEntity } from './schedule-typeorm.entity';
 
-const SORT_FIELD_MAP: Record<ScheduleSortField, keyof ScheduleTypeOrmEntity> = {
+const SORT_FIELD_MAP: Partial<Record<ScheduleSortField, keyof ScheduleTypeOrmEntity>> = {
   slot: 'slot',
   createdAt: 'createdAt',
 };
