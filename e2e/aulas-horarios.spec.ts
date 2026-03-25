@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { randomBytes } from 'node:crypto';
 
 const ADMIN_USER = 'admin';
@@ -8,30 +8,62 @@ function suffix(): string {
   return randomBytes(3).toString('hex').toUpperCase();
 }
 
-function uniqueSchedulePair() {
-  const minuteOptions = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
-  const createdMinute =
-    minuteOptions[Math.floor(Math.random() * minuteOptions.length)];
-  const updatedMinute =
-    minuteOptions[Math.floor(Math.random() * minuteOptions.length)];
-  const createdHour = String(6 + Math.floor(Math.random() * 6)).padStart(2, '0');
-  const updatedHour = String(13 + Math.floor(Math.random() * 6)).padStart(2, '0');
-  const createdEndHour = String(Number(createdHour) + 2).padStart(2, '0');
-  const updatedEndHour = String(Number(updatedHour) + 2).padStart(2, '0');
+function buildCandidateSlots(): Array<{
+  day: string;
+  start: string;
+  end: string;
+  slot: string;
+}> {
+  const days = [
+    'Lunes',
+    'Martes',
+    'Miércoles',
+    'Jueves',
+    'Viernes',
+    'Sábado',
+    'Domingo',
+  ];
+  const candidates: Array<{
+    day: string;
+    start: string;
+    end: string;
+    slot: string;
+  }> = [];
+
+  for (const day of days) {
+    for (let hour = 6; hour <= 19; hour += 1) {
+      for (const minute of ['00', '10', '20', '30', '40', '50']) {
+        const startHour = String(hour).padStart(2, '0');
+        const endHour = String(hour + 2).padStart(2, '0');
+        const start = `${startHour}:${minute}`;
+        const end = `${endHour}:${minute}`;
+        candidates.push({
+          day,
+          start,
+          end,
+          slot: `${day} ${start}-${end}`,
+        });
+      }
+    }
+  }
+
+  return candidates;
+}
+
+async function pickUnusedSlots(page: Page) {
+  const existingTexts = await page.locator('tbody tr').allTextContents();
+  const candidates = buildCandidateSlots();
+  const available = candidates.filter(
+    (candidate) => !existingTexts.some((text) => text.includes(candidate.slot)),
+  );
+
+  if (available.length < 2) {
+    throw new Error('No se encontraron suficientes horarios libres para el e2e');
+  }
 
   return {
-    created: {
-      day: 'Domingo',
-      start: `${createdHour}:${createdMinute}`,
-      end: `${createdEndHour}:${createdMinute}`,
-      slot: `Domingo ${createdHour}:${createdMinute}-${createdEndHour}:${createdMinute}`,
-    },
-    updated: {
-      day: 'Sábado',
-      start: `${updatedHour}:${updatedMinute}`,
-      end: `${updatedEndHour}:${updatedMinute}`,
-      slot: `Sábado ${updatedHour}:${updatedMinute}-${updatedEndHour}:${updatedMinute}`,
-    },
+    created: available[0],
+    updated: available[1],
   };
 }
 
@@ -50,7 +82,6 @@ test.describe('Aulas y horarios (e2e)', () => {
   test('crea, edita y elimina aulas y horarios', async ({ page }) => {
     const code1 = `LAB-${suffix()}`;
     const code2 = `LAB-${suffix()}`;
-    const schedulePair = uniqueSchedulePair();
 
     await page.goto('/aulas');
     await expect(page.getByRole('heading', { name: /aulas/i })).toBeVisible();
@@ -69,13 +100,14 @@ test.describe('Aulas y horarios (e2e)', () => {
 
     await page.goto('/horarios');
     await expect(page.getByRole('heading', { name: /horarios/i })).toBeVisible();
+    const schedulePair = await pickUnusedSlots(page);
     await page.getByRole('button', { name: /agregar horario/i }).click();
     await expect(page).toHaveURL(/\/horarios\/registro/);
 
     await expect(page.getByLabel(/curso/i)).toBeEnabled();
     await expect(page.locator('#course option')).toHaveCount(4);
     await expect(page.getByLabel(/aula/i)).toBeEnabled();
-    await page.getByLabel(/curso/i).selectOption({ index: 1 });
+    await page.getByLabel(/curso/i).selectOption({ index: 2 });
     await page.getByLabel(/aula/i).selectOption({ label: `${code1} - Bloque E` });
     await page
       .getByLabel(/dia de la semana|d[ií]a de la semana/i)

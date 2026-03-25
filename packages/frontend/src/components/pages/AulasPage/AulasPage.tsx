@@ -119,7 +119,7 @@ export function AulasPage() {
               columns={CLASSROOM_COLUMNS}
               data={classrooms}
               keyExtractor={(row) => row.id}
-              defaultPageSize={50}
+              defaultPageSize={500}
               emptyMessage="No hay aulas registradas."
               renderActions={(row) => (
                 <div className="flex items-center justify-end gap-2">
