@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { MainLayout } from '../../templates/MainLayout';
-import { useAuthStore } from '../../../stores';
 import { Input } from '../../atoms/Input';
 import { Button } from '../../atoms/Button';
 import { changePassword } from '../../../services/authService';
@@ -16,10 +15,7 @@ import {
   updateStudentUserEmail,
 } from './../../../services/studentService';
 
-
-
 export function MiPerfilPage() {
-  const user = useAuthStore((s) => s.user);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -28,8 +24,6 @@ export function MiPerfilPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-
-
   const [student, setStudent] = useState<Student | null>(null);
   const [birthDate, setBirthDate] = useState("");
   const [email, setEmail] = useState("");
@@ -70,7 +64,6 @@ export function MiPerfilPage() {
     }
   }
 
-
   async function handleSave() {
     if (!student) return;
 
@@ -87,7 +80,6 @@ export function MiPerfilPage() {
       console.error("Error guardando datos:", error);
     }
   }
-
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -139,11 +131,9 @@ export function MiPerfilPage() {
     }
   };
 
-
   if (!student) {
     return <MainLayout>Cargando...</MainLayout>;
   }
-
 
   return (
     <MainLayout>
