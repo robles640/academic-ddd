@@ -1,0 +1,1 @@
+export { AulasPage } from './AulasPage';

@@ -1,5 +1,9 @@
 import { apiRequest } from '../lib';
-import type { Student, CreateStudentDto, UpdateStudentDto } from '../entities';
+import { formatBirthDateForBackend } from '../lib';
+
+import type { Student, CreateStudentDto, UpdateStudentDto, User } from '../entities';
+
+
 
 export type { Student, CreateStudentDto, UpdateStudentDto } from '../entities';
 
@@ -54,6 +58,31 @@ export async function getStudent(id: string): Promise<Student> {
   }
 }
 
+export async function updateStudentBirthDate(
+  id: string,
+  birthDate: string,
+): Promise<Student> {
+  return apiRequest<Student>(`/students/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+          birthDate: formatBirthDateForBackend(birthDate),
+    }),
+    defaultErrorMessage: 'Error al actualizar alumno',
+  });
+}
+
+
+export async function updateStudentUserEmail(
+  id: string,
+  email: string,
+): Promise<User> {
+  return apiRequest<User>(`/users/${id}/email`, {
+    method: 'PATCH',
+    body: JSON.stringify({email}),
+    defaultErrorMessage: 'Error al actualizar alumno',
+  });
+}
+
 export async function updateStudent(
   id: string,
   data: UpdateStudentDto,
@@ -64,6 +93,8 @@ export async function updateStudent(
     defaultErrorMessage: 'Error al actualizar alumno',
   });
 }
+
+
 
 export async function deleteStudent(id: string): Promise<void> {
   try {

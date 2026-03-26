@@ -2,8 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Schedule } from '../domain/schedule.entity';
-import { IScheduleRepository } from '../domain/schedule.repository';
+import { IScheduleRepository, type FindPaginatedOptions, type ScheduleSortField } from '../domain/schedule.repository';
 import { ScheduleTypeOrmEntity } from './schedule-typeorm.entity';
+
+const SORT_FIELD_MAP: Partial<Record<ScheduleSortField, keyof ScheduleTypeOrmEntity>> = {
+  slot: 'slot',
+  createdAt: 'createdAt',
+};
 
 @Injectable()
 export class ScheduleTypeOrmRepository implements IScheduleRepository {
@@ -27,12 +32,33 @@ export class ScheduleTypeOrmRepository implements IScheduleRepository {
       id: schedule.id,
       courseId: schedule.courseId,
       slot: schedule.slot,
+      classroomId: schedule.classroomId,
     });
     await this.repo.save(row);
     return schedule;
   }
 
-  private toDomain(row: ScheduleTypeOrmEntity): Schedule {
-    return new Schedule(row.id, row.courseId, row.slot);
+  async delete(id: string): Promise<void> {
+    await this.repo.delete(id);
   }
+
+  private toDomain(row: ScheduleTypeOrmEntity): Schedule {
+    return new Schedule(row.id, row.courseId, row.slot, row.classroomId);
+  }
+
+  async count(): Promise<number> {
+    return this.repo.count();
+  }
+
+  async findPaginated(options: FindPaginatedOptions): Promise<{ data: Schedule[]; total: number }> {
+      const { offset, limit, sortBy = 'createdAt', sortOrder = 'asc' } = options;
+      const orderField = SORT_FIELD_MAP[sortBy] ?? 'createdAt';
+      const [rows, total] = await this.repo.findAndCount({
+        order: { [orderField]: sortOrder.toUpperCase() as 'ASC' | 'DESC' },
+        skip: offset,
+        take: limit,
+      });
+      return { data: rows.map((r) => this.toDomain(r)), total };
+    }
+
 }

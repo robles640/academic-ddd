@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { Course } from '../domain/course.entity';
+import { Course } from '../domain/course';
 import { ICourseRepository, COURSE_REPOSITORY } from '../domain/course.repository';
 
 @Injectable()
@@ -17,13 +17,24 @@ export class CourseService {
     return this.courseRepository.findById(id);
   }
 
-  async create(data: {
-    name: string;
-    code: string;
-    credits: number;
-  }): Promise<Course> {
-    const id = crypto.randomUUID();
-    const course = new Course(id, data.name, data.code, data.credits);
-    return this.courseRepository.save(course);
+  async create(data: any) {
+    const courseData = { id: crypto.randomUUID(), ...data };
+    return await this.courseRepository.save(courseData);
   }
+
+  async update(id: string, data: any) {
+  const course = await this.findById(id);
+  if (!course) return null;
+
+  Object.assign(course, data);
+  return await this.courseRepository.save(course);
+}
+
+async remove(id: string) {
+  const course = await this.findById(id);
+  if (!course) return null;
+
+  await this.courseRepository.delete(id);
+  return course;
+}
 }

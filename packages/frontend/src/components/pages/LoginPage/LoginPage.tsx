@@ -29,6 +29,8 @@ export function LoginPage() {
     setLoading(true);
     try {
       const result = await login(username, password);
+      const response = await login(username, password);
+      localStorage.setItem('token', response.access_token);
       setAuth(
         {
           id: result.user.id,

@@ -4,9 +4,17 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { MiPerfilPage } from './MiPerfilPage';
 import * as authService from '../../../services/authService';
+import * as studentService from '../../../services/studentService';
 
 vi.mock('../../../services/authService', () => ({
   changePassword: vi.fn(),
+}));
+
+vi.mock('../../../services/studentService', () => ({
+  getStudents: vi.fn(),
+  getStudent: vi.fn(),
+  updateStudentBirthDate: vi.fn(),
+  updateStudentUserEmail: vi.fn(),
 }));
 
 vi.mock('../../../stores', async (importOriginal) => {
@@ -32,6 +40,8 @@ vi.mock('../../../stores', async (importOriginal) => {
 });
 
 const mockChangePassword = vi.mocked(authService.changePassword);
+const mockGetStudents = vi.mocked(studentService.getStudents);
+const mockGetStudent = vi.mocked(studentService.getStudent);
 
 describe('MiPerfilPage', () => {
   function renderPage() {
@@ -44,6 +54,32 @@ describe('MiPerfilPage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.setItem(
+      'academic_user',
+      JSON.stringify({ id: 'user-1', role: 'ADMINISTRATOR' }),
+    );
+    mockGetStudents.mockResolvedValue([
+      {
+        id: 'student-1',
+        userId: 'user-1',
+        firstName: 'Admin',
+        lastName: 'User',
+        document: '12345678',
+        code: '20240001',
+        birthDate: '2000-01-01T00:00:00.000Z',
+        email: 'admin@academic.local',
+      },
+    ]);
+    mockGetStudent.mockResolvedValue({
+      id: 'student-1',
+      userId: 'user-1',
+      firstName: 'Admin',
+      lastName: 'User',
+      document: '12345678',
+      code: '20240001',
+      birthDate: '2000-01-01T00:00:00.000Z',
+      email: 'admin@academic.local',
+    });
   });
 
   it('envía el formulario y muestra mensaje de éxito', async () => {
@@ -55,7 +91,7 @@ describe('MiPerfilPage', () => {
     renderPage();
 
     await user.type(
-      screen.getByLabelText(/contraseña actual/i, { selector: 'input' }),
+      await screen.findByLabelText(/contraseña actual/i, { selector: 'input' }),
       'Actual123!',
     );
     await user.type(
@@ -89,7 +125,7 @@ describe('MiPerfilPage', () => {
     renderPage();
 
     await user.type(
-      screen.getByLabelText(/contraseña actual/i, { selector: 'input' }),
+      await screen.findByLabelText(/contraseña actual/i, { selector: 'input' }),
       'Actual123!',
     );
     await user.type(
@@ -115,10 +151,10 @@ describe('MiPerfilPage', () => {
 
     renderPage();
 
-    const currentPasswordInput = screen.getByLabelText(
+    const currentPasswordInput = (await screen.findByLabelText(
       /contraseña actual/i,
       { selector: 'input' },
-    ) as HTMLInputElement;
+    )) as HTMLInputElement;
     const newPasswordInput = screen.getByLabelText(
       /^nueva contraseña$/i,
       { selector: 'input' },

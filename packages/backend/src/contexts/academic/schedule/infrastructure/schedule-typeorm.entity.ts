@@ -17,6 +17,9 @@ export class ScheduleTypeOrmEntity {
   @Column()
   slot: string;
 
+  @Column('uuid', { name: 'classroom_id', nullable: true })
+  classroomId: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

@@ -7,7 +7,7 @@ services:
     container_name: academic-db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: P@ostgres1
       POSTGRES_DB: academic
     ports:
       - "5432:5432"

@@ -1,39 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Course } from '../domain/course.entity';
-import { ICourseRepository } from '../domain/course.repository';
-import { CourseTypeOrmEntity } from './course-typeorm.entity';
+
+import { CourseEntity } from './persistence/course.entity';
+import { Course } from '../domain/course';
 
 @Injectable()
-export class CourseTypeOrmRepository implements ICourseRepository {
+export class CourseTypeOrmRepository {
   constructor(
-    @InjectRepository(CourseTypeOrmEntity)
-    private readonly repo: Repository<CourseTypeOrmEntity>,
+    @InjectRepository(CourseEntity)
+    private readonly repository: Repository<CourseEntity>,
   ) {}
 
   async findAll(): Promise<Course[]> {
-    const rows = await this.repo.find({ order: { createdAt: 'ASC' } });
-    return rows.map((r) => this.toDomain(r));
+    const rows = await this.repository.find();
+    return rows.map(
+      (row) => new Course(row.id, row.name, row.code, row.credits),
+    );
   }
 
   async findById(id: string): Promise<Course | null> {
-    const row = await this.repo.findOne({ where: { id } });
-    return row ? this.toDomain(row) : null;
+    const row = await this.repository.findOne({ where: { id } });
+    return row ? new Course(row.id, row.name, row.code, row.credits) : null;
   }
 
-  async save(course: Course): Promise<Course> {
-    const row = this.repo.create({
-      id: course.id,
-      name: course.name,
-      code: course.code,
-      credits: course.credits,
+  async save(data: any): Promise<Course> {
+    const entity = this.repository.create({
+      id: data.id,
+      name: data.name,
+      code: data.code,
+      credits: data.credits,
     });
-    await this.repo.save(row);
-    return course;
+    const saved = await this.repository.save(entity) as unknown as CourseEntity;
+
+    return new Course(saved.id, saved.name, saved.code, saved.credits);
   }
 
-  private toDomain(row: CourseTypeOrmEntity): Course {
-    return new Course(row.id, row.name, row.code, row.credits);
+  async delete(id: string): Promise<void> {
+    await this.repository.delete(id);
   }
 }

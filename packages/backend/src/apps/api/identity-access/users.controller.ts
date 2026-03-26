@@ -40,6 +40,21 @@ export class UsersController {
     return users.map(toUserResponse);
   }
 
+  @Get('me')
+  async findCurrentUser(@Req() req: AuthenticatedRequest) {
+    const userId = req.user?.id;
+    if (!userId) {
+      throw new UnauthorizedException('No autorizado');
+    }
+
+    const user = await this.userService.findById(userId);
+    if (!user) {
+      throw new NotFoundException('Usario no encontrado');
+    }
+
+    return toUserResponse(user);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const user = await this.userService.findById(id);
@@ -60,6 +75,16 @@ export class UsersController {
     return toUserResponse(user);
   }
 
+  @Patch(':id/email')
+  async updateEmail(
+    @Param('id') id: string,
+    @Body('email') email:string
+  ) {
+    const user = await this.userService.updateEmail(id, email);
+    if (!user) throw new NotFoundException('User not found');
+    return user;
+  }
+ 
   @Patch('me')
   async changeMyPassword(
     @Req() req: AuthenticatedRequest,
@@ -83,4 +108,5 @@ export class UsersController {
 
     return { message: 'Password updated successfully' };
   }
+
 }
