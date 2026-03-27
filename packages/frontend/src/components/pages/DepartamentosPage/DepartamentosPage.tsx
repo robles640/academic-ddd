@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react';
 import { MainLayout } from '../../templates/MainLayout';
 import { apiRequest } from '../../../lib'; 
+import mixpanel from 'mixpanel-browser';
+
+// Inicializamos Mixpanel con tu Token
+mixpanel.init('e6a058577918b4507eef4b93a9596e4b', { debug: true, track_pageview: true });
 
 export function DepartamentosPage() {
   const [departments, setDepartments] = useState<any[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: '', code: '', parentId: '' });
+
+  // EVENTO DE MIXPANEL: Se dispara al entrar a la página
+  useEffect(() => {
+    mixpanel.track('Visito_Pagina_Departamentos_Alan');
+  }, []);
 
   const load = async () => {
     try {
@@ -32,14 +41,16 @@ export function DepartamentosPage() {
         // EDITAR (PATCH)
         await apiRequest(`/departments/${editingId}`, {
           method: 'PATCH',
-          body: JSON.stringify(payload), // <--- AGREGADO JSON.STRINGIFY
+          body: JSON.stringify(payload),
         });
+        mixpanel.track('Edito_Departamento', { nombre: form.name }); // Rastreo extra
       } else {
         // CREAR (POST)
         await apiRequest('/departments', {
           method: 'POST',
-          body: JSON.stringify(payload), // <--- AGREGADO JSON.STRINGIFY
+          body: JSON.stringify(payload),
         });
+        mixpanel.track('Creo_Departamento', { nombre: form.name }); // Rastreo extra
       }
       
       setForm({ name: '', code: '', parentId: '' });
@@ -47,7 +58,6 @@ export function DepartamentosPage() {
       await load();
       alert("¡Operación exitosa!");
     } catch (e: any) {
-      // Ahora el alert te dirá el error REAL (ej: si el código está duplicado)
       alert("Error del servidor: " + (e.message || "Error al procesar"));
       console.error(e);
     }
@@ -57,6 +67,7 @@ export function DepartamentosPage() {
     if (!confirm("¿Seguro que quieres eliminar este departamento?")) return;
     try {
       await apiRequest(`/departments/${id}`, { method: 'DELETE' });
+      mixpanel.track('Elimino_Departamento'); // Rastreo extra
       load();
     } catch (e) { alert("Error al eliminar"); }
   };
