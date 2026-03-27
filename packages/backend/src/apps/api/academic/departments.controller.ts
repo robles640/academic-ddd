@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, NotFoundException, SetMetadata } from '@nestjs/common';
 import { DepartmentService } from '../../../contexts/academic/department/application/department.service';
 
+// ESTA LÍNEA ES LA MAGIA QUE EVITA QUE TE BOTEN AL LOGIN
+@SetMetadata('isPublic', true)
 @Controller('departments')
 export class DepartmentsController {
   constructor(private readonly departmentService: DepartmentService) {}
