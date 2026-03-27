@@ -6,6 +6,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.set('trust proxy', 1);
   app.use(cookieParser());
@@ -21,10 +22,13 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  
+  // Aquí abrimos la puerta tanto para tu compu local como para Vercel en la nube
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: ['http://localhost:5173', 'https://academic-ddd-frontend-alpha.vercel.app'],
     credentials: true,
   });
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
